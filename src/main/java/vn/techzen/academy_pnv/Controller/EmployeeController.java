@@ -23,19 +23,31 @@ public class EmployeeController {
             new Employee(UUID.randomUUID(), "Hung", LocalDate.of(1988, 7, 5), "FEMALE", 14888888.88, "0986555333"),
             new Employee(UUID.randomUUID(), "Nhi", LocalDate.of(1995, 9, 25), "MALE", 15288888.88, "0973388668")
     ));
-    // API tìm kiếm nhân viên
     @GetMapping("/search")
     public ResponseEntity<List<Employee>> searchEmployees(
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "startDob", required = false) LocalDate startDob,
-            @RequestParam(value = "endDob", required = false) LocalDate endDob,
+            @RequestParam(value = "startDob", required = false) String startDob,
+            @RequestParam(value = "endDob", required = false) String endDob,
             @RequestParam(value = "gender", required = false) String gender) {
+
+        LocalDate startDate = (startDob != null) ? LocalDate.parse(startDob) : null;
+        LocalDate endDate = (endDob != null) ? LocalDate.parse(endDob) : null;
+        Gender genderEnum = null;
+
+        // Chuyển đổi từ chuỗi sang enum
+        if (gender != null) {
+            try {
+                genderEnum = Gender.valueOf(gender.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().build(); // Trả về lỗi nếu gender không hợp lệ
+            }
+        }
 
         List<Employee> result = employees.stream()
                 .filter(e -> name == null || e.getName().toLowerCase().contains(name.toLowerCase()))
-                .filter(e -> startDob == null || (e.getDob().isEqual(startDob) || e.getDob().isAfter(startDob)))
-                .filter(e -> endDob == null || (e.getDob().isEqual(endDob) || e.getDob().isBefore(endDob)))
-                .filter(e -> gender == null || e.getGender().equalsIgnoreCase(gender))
+                .filter(e -> startDate == null || (e.getDob().isEqual(startDate) || e.getDob().isAfter(startDate)))
+                .filter(e -> endDate == null || (e.getDob().isEqual(endDate) || e.getDob().isBefore(endDate)))
+                .filter(e -> genderEnum == null || e.getGender() == genderEnum)
                 .toList();
 
         return ResponseEntity.ok(result);
