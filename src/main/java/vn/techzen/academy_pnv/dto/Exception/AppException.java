@@ -1,4 +1,4 @@
-package vn.techzen.academy_pnv.dto;
+package vn.techzen.academy_pnv.dto.Exception;
 
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -2,79 +2,42 @@ package vn.techzen.academy_pnv.Controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import vn.techzen.academy_pnv.model.Employee;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import vn.techzen.academy_pnv.dto.Exception.ErrorCode;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
-@RestController
-@RequestMapping("/employees")
+@RestControllerAdvice
 public class EmployeeController {
 
-    private final List<Employee> employees = new ArrayList<>(Arrays.asList(
-            new Employee(UUID.randomUUID(), "Tan", LocalDate.of(1998, 1, 15), "MALE", 15888868.88, "0975123542"),
-            new Employee(UUID.randomUUID(), "Duc", LocalDate.of(1985, 5, 28), "FEMALE", 14588888.88, "0967869868"),
-            new Employee(UUID.randomUUID(), "Bảo", LocalDate.of(1992, 3, 18), "MALE", 15588868.88, "0988881113"),
-            new Employee(UUID.randomUUID(), "Hung", LocalDate.of(1988, 7, 5), "FEMALE", 14888888.88, "0986555333"),
-            new Employee(UUID.randomUUID(), "Nhi", LocalDate.of(1995, 9, 25), "MALE", 15288888.88, "0973388668")
-    ));
+    // Xử lý lỗi validation
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorCode> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
 
-    // GET /employees
-    @GetMapping
-    public ResponseEntity<List<Employee>> getAll() {
-        return ResponseEntity.ok(employees);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorCode.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message("Validation Error")
+                        .timestamp(LocalDateTime.now())
+                        .build());
     }
 
-    // GET /employees/{id}
-    @GetMapping("/{id}")
-    public ResponseEntity<Employee> getById(@PathVariable("id") UUID id) {
-        return employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // POST /employees
-    @PostMapping
-    public ResponseEntity<Employee> create(@RequestBody Employee employee) {
-        employee.setId(UUID.randomUUID());
-        employees.add(employee);
-        return ResponseEntity.status(HttpStatus.CREATED).body(employee);
-    }
-
-    // PUT /employees/{id}
-    @PutMapping("/{id}")
-    public ResponseEntity<Employee> update(@PathVariable("id") UUID id, @RequestBody Employee updatedEmployee) {
-        Optional<Employee> existingEmployeeOpt = employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst();
-
-        if (existingEmployeeOpt.isPresent()) {
-            Employee existingEmployee = existingEmployeeOpt.get();
-            existingEmployee.setName(updatedEmployee.getName());
-            existingEmployee.setDob(updatedEmployee.getDob());
-            existingEmployee.setGender(updatedEmployee.getGender());
-            existingEmployee.setSalary(updatedEmployee.getSalary());
-            existingEmployee.setPhone(updatedEmployee.getPhone());
-            return ResponseEntity.ok(existingEmployee);
-        }
-
-        return ResponseEntity.notFound().build();
-    }
-
-    // DELETE /employees/{id}
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
-        boolean removed = employees.removeIf(e -> e.getId().equals(id));
-        if (removed) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+    // Xử lý lỗi chung
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorCode> handleGeneralException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorCode.builder()
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message(ex.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build());
     }
 }
