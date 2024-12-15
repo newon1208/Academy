@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class AppException extends ErrorCode {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class AppException extends RuntimeException {
     ErrorCode errorCode;
 
-    // Constructor để khởi tạo errorCode
     public AppException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 }
