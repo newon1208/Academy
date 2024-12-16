@@ -1,24 +1,16 @@
 package vn.techzen.academy_pnv.repository;
 
-
-
-import vn.techzen.academy_pnv.dto.employee.EmployeeSearchRequest;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import vn.techzen.academy_pnv.model.Employee;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface IEmployeeRepository {
+public interface IEmployeeRepository extends JpaRepository<Employee, UUID> {
 
-    List<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest);
+    // Tìm kiếm theo tên và mức lương trong khoảng
+    List<Employee> findByNameContainingAndSalaryBetween(String name, Double fromSalary, Double toSalary);
 
-    List<Employee> findAll();
-
-    Employee findById(UUID id);
-
-    Employee save(Employee employee);
-
-    Employee update(Employee employee);
-
-    Employee delete(Employee employee);
 }

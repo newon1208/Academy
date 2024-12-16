@@ -1,23 +1,24 @@
 package vn.techzen.academy_pnv.utils;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import vn.techzen.academy_pnv.dto.ApiResponse;
 
 public class JsonResponse {
 
-    public static <T> ResponseEntity<ApiResponse<T>> ok(T t) {
-        return ResponseEntity.ok(ApiResponse.<T>builder().data(t).build());
-    }
-    public static <T> ResponseEntity<ApiResponse<T>> created(T t) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.<T>builder().data(t).build());
+    // Example of returning an OK response
+    public static ResponseEntity<?> ok(Object data) {
+        return ResponseEntity.ok(data);
     }
 
-
-
-    public static ResponseEntity<Void> notFound() {
-        return ResponseEntity.notFound().build();
+    // Example of returning a Created response
+    public static ResponseEntity<?> created(Object data) {
+        return new ResponseEntity<>(data, HttpStatus.CREATED);
     }
+
+    // Example of returning No Content response
+    public static ResponseEntity<?> noContent() {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Add more methods here as required, ensuring all return statements are included
 }

@@ -1,41 +1,55 @@
 package vn.techzen.academy_pnv.Controller;
 
-import org.springframework.http.HttpStatus;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.techzen.academy_pnv.model.Student;
+import vn.techzen.academy_pnv.service.IStudentService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/students")
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentController {
-    private List<Student> students = new ArrayList<>(
-            List.of(
-                    new Student(1, "Tan", 18),
-                    new Student(2, "duc", 19)
-            )
-    );
+
+    IStudentService studentService;
 
     @GetMapping
     public ResponseEntity<List<Student>> getStudents() {
+        List<Student> students = studentService.findAll();
         return ResponseEntity.ok(students);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudent(@PathVariable int id) {
-        return students.stream()
-                .filter(student -> student.getId() == id)
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @PostMapping
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        Student savedStudent = studentService.save(student);
+        return ResponseEntity.ok(savedStudent);
     }
 
-    @PostMapping
-    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        student.setId((int) (Math.random() * 10000)); // Consider using a more reliable ID generation
-        students.add(student);
-        return ResponseEntity.status(HttpStatus.CREATED).body(student);
+    @GetMapping("/{id}")
+    public ResponseEntity<Student> getStudentById(@PathVariable Integer id) {
+        return studentService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Student> updateStudent(@PathVariable Integer id, @RequestBody Student student) {
+        return studentService.update(id, student)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStudent(@PathVariable Integer id) {
+        if (studentService.delete(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

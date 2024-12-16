@@ -1,19 +1,22 @@
 package vn.techzen.academy_pnv.model;
 
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Entity
+@Table(name = "employees")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Employee {
-
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
      UUID id;
 
      String name;

@@ -6,17 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-@Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Student {
+@Entity
+@Table(name = "department")
+public class Department {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     int id;
+     int id;  // Ensure that 'id' is a valid column type in your database
      String name;
-     double score;
 
 }
+
+
