@@ -34,4 +34,10 @@ public class Employee {
      public enum Gender {
           MALE, FEMALE, OTHER;
      }
+     @PrePersist
+     public void generateId() {
+          if (id == null) {
+               id = UUID.randomUUID();
+          }
+}
 }

@@ -3,7 +3,10 @@ package vn.techzen.academy_pnv.service.impl;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import vn.techzen.academy_pnv.dto.page.PageResponse;
 import vn.techzen.academy_pnv.dto.employee.EmployeeSearchRequest;
 import vn.techzen.academy_pnv.model.Employee;
 import vn.techzen.academy_pnv.repository.IEmployeeRepository;
@@ -21,9 +24,42 @@ public class EmployeeService implements IEmployeeService {
     IEmployeeRepository employeeRepository;
 
     @Override
+    public PageResponse<Employee> findAll(Pageable pageable) {
+        Page<Employee> employeePage = employeeRepository.findAll(pageable);
+        return PageResponse.<Employee>builder()
+                .currentPage(employeePage.getNumber())
+                .totalPages(employeePage.getTotalPages())
+                .pageSize(employeePage.getSize())
+                .totalElements(employeePage.getTotalElements())
+                .data(employeePage.getContent())
+                .build();
+    }
+
+    @Override
+    public PageResponse<Employee> search(String name, Pageable pageable) {
+        Page<Employee> employeePage = employeeRepository.findByNameContaining(name, pageable);
+        return PageResponse.<Employee>builder()
+                .currentPage(employeePage.getNumber())
+                .totalPages(employeePage.getTotalPages())
+                .pageSize(employeePage.getSize())
+                .totalElements(employeePage.getTotalElements())
+                .data(employeePage.getContent())
+                .build();
+    }
+
+    @Override
+    public List<Employee> findAll(java.awt.print.Pageable pageable) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<Employee> findById(Integer id) {
+        return Optional.empty();
+    }
+
+    @Override
     public Employee save(Employee employee) {
-        // Lưu hoặc cập nhật thông tin Employee
-        return employeeRepository.save(employee);
+        return null;
     }
 
     @Override
@@ -37,50 +73,22 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public List<Employee> findAll() {
-        // Lấy danh sách tất cả Employee từ cơ sở dữ liệu
-        return employeeRepository.findAll();
-    }
-
-    @Override
-    public Optional<Employee> findById(Integer id) {
+    public Optional<Employee> findById(UUID id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Employee> findById(UUID id) {
-        // Tìm Employee theo ID
-        return employeeRepository.findById(id);
-    }
-
-    @Override
     public Optional<Employee> update(UUID id, Employee employee) {
-        // Kiểm tra Employee có tồn tại không
-        return employeeRepository.findById(id).map(existingEmployee -> {
-            existingEmployee.setName(employee.getName());
-            existingEmployee.setDob(employee.getDob());
-            existingEmployee.setGender(employee.getGender());
-            existingEmployee.setSalary(employee.getSalary());
-            existingEmployee.setPhone(employee.getPhone());
-            existingEmployee.setDepartmentId(employee.getDepartmentId());
-            return employeeRepository.save(existingEmployee);
-        });
+        return Optional.empty();
     }
 
     @Override
     public boolean delete(UUID id) {
-        // Xóa Employee theo ID
-        if (employeeRepository.existsById(id)) {
-            employeeRepository.deleteById(id);
-            return true;
-        }
         return false;
     }
 
     @Override
-    public List<Employee> search(EmployeeSearchRequest searchRequest) {
+    public List<Employee> search(EmployeeSearchRequest searchRequest, String name, java.awt.print.Pageable pageable) {
         return List.of();
     }
-
-
 }

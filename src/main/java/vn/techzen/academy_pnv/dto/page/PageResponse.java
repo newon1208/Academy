@@ -1,4 +1,4 @@
-package vn.techzen.academy_pnv.dto;
+package vn.techzen.academy_pnv.dto.page;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

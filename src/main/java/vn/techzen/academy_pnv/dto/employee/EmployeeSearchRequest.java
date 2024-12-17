@@ -27,4 +27,9 @@ public class EmployeeSearchRequest {
     Integer departmentId;
 
 
+    public void setEndDob(String endDob) {
+    }
+
+    public void setStartDob(String startDob) {
+    }
 }
